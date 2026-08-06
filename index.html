@@ -134,9 +134,10 @@
   }
 
   /* ---------- SCENE 1 : OPENING (dramaconfa) ---------- */
- /* ---------- SCENE 1 : OPENING (финальное исправление) ---------- */
+/* ---------- SCENE 1 : OPENING ---------- */
 .s1 {
   padding: 0;
+  overflow: hidden;
 }
 .s1-grid {
   position: relative;
@@ -147,38 +148,39 @@
   justify-content: center;
 }
 .s1-title-wrap {
-  position: relative;
-  text-align: center;
-  z-index: 5;
   display: flex;
-  flex-direction: column;    /* ← вертикальный стек */
-  align-items: center;       /* ← центрирование по горизонтали */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  max-width: 100vw;
+  z-index: 5;
 }
-.title-drama {
-  font-family: 'Archivo Black', sans-serif;
-  font-weight: 400;
-  font-size: clamp(4rem, 16vw, 18rem);
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--bone);
-  white-space: nowrap;
-  display: block;
-  margin: 0;                 /* ← сброс любых внешних отступов h1 */
-}
+.title-drama,
 .title-confa {
   font-family: 'Archivo Black', sans-serif;
-  font-style: italic;
   font-weight: 400;
-  font-size: clamp(4rem, 16vw, 18rem);
+  font-size: clamp(3rem, 14vw, 16rem);
   line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--signal);
-  text-shadow: 0 0 80px rgba(255,30,60,0.4);
+  letter-spacing: -0.03em;
   white-space: nowrap;
   display: block;
-  margin: 0;                 /* ← сброс любых внешних отступов h1 */
+  margin: 0;
+  padding: 0;
+  width: auto;
+  max-width: 95vw;
+  overflow: visible;
 }
-
+.title-drama {
+  color: var(--bone);
+}
+.title-confa {
+  font-style: italic;
+  color: var(--signal);
+  text-shadow: 0 0 80px rgba(255,30,60,0.4);
+  margin-top: -0.05em;
+}
   .s1-center {
     position: absolute;
     top: 50%;
@@ -676,14 +678,12 @@
 <!-- ============ SCENE 1 : OPENING ============ -->
 <section class="scene s1" id="s1">
   <div class="s1-grid">
-    <div class="s1-left">
+    <div class="s1-title-wrap">
       <h1 class="title-drama" data-split>DRAMA</h1>
-      <span class="idx i3">§ 001 / SCROLL DOWN</span>
-    </div>
-    <div class="s1-right">
       <h1 class="title-confa" data-split>CONFA</h1>
     </div>
   </div>
+  
   <div class="s1-center">
     <div class="tagline">
       REALITY <span class="accent">vibecoded</span> WRONG
