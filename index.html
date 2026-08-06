@@ -536,22 +536,28 @@
   }
 
   /* ---------- CURSOR ---------- */
-  .cursor {
-    position: fixed;
-    pointer-events: none;
-    z-index: 200;
-    transform: translate(-50%, -50%);
-    mix-blend-mode: difference;
-  }
-  .cursor-dot {
-    position: absolute;
-    width: 6px; height: 6px;
-    background: var(--signal);
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.2s;
-  }
+.cursor {
+  position: fixed;
+  width: 20px; height: 20px;
+  border: 1px solid var(--fg);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, border-color 0.3s, background 0.3s;
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  position: fixed;
+  width: 4px; height: 4px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 998;
+  transform: translate(-50%, -50%);
+}
+.cursor.hover { width: 50px; height: 50px; background: var(--accent); border-color: var(--accent); }
+
   .cursor-ring {
     position: absolute;
     width: 40px; height: 40px;
