@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DRAMACONFA — a transmission by 134</title>
+<style>
+  :root {
+    --void: #070405;
+    --deep: #0c0607;
+    --blood: #a3001a;
+    --signal: #ff1e3c;
+    --bone: #e8dfda;
+    --ash: #706666;
+    --faint: rgba(232, 223, 218, 0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    scroll-behavior: auto;
+  }
+
+  body {
+    background: var(--void);
+    color: var(--bone);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---------- CANVAS LAYERS ---------- */
+  #grain {
+    position: fixed;
+    inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 90;
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 89;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(0,0,0,0.25) 4px,
+      rgba(0,0,0,0.25) 5px
+    );
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 88;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.6) 100%);
+  }
+
+  /* ---------- PAGE NUMBER (134 sigil) ---------- */
+  .sigil {
+    position: fixed;
+    top: 2.5rem;
+    right: 2.5rem;
+    z-index: 50;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--ash);
+    letter-spacing: 0.1em;
+    mix-blend-mode: difference;
+  }
+  .sigil::before {
+    content: '—';
+    margin-right: 0.6em;
+    color: var(--signal);
+  }
+  .sigil .num {
+    font-style: normal;
+    font-weight: 400;
+    color: var(--bone);
+    font-family: 'Courier New', monospace;
+    letter-spacing: 0.2em;
+    font-size: 0.75rem;
+  }
+
+  /* small marker top-left */
+  .marker {
+    position: fixed;
+    top: 2.5rem;
+    left: 2.5rem;
+    z-index: 50;
+    font-size: 0.6rem;
+    letter-spacing: 0.5em;
+    color: var(--ash);
+    text-transform: uppercase;
+    mix-blend-mode: difference;
+  }
+  .marker .dot {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    background: var(--signal);
+    border-radius: 50%;
+    margin-right: 0.8em;
+    vertical-align: middle;
+    box-shadow: 0 0 8px var(--signal);
+    animation: pulseDot 2s infinite;
+  }
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.7); }
+  }
+
+  /* ---------- SCENES ---------- */
+  .scene {
+    position: relative;
+    min-height: 100vh;
+    width: 100%;
+    padding: 8vh 6vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* ---------- SCENE 1 : OPENING ---------- */
+  .s1 {
+    padding: 0;
+  }
+  .s1-grid {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+  }
+  .s1-left, .s1-right {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 6vh 5vw;
+  }
+  .s1-right {
+    align-items: flex-start;
+    justify-content: flex-end;
+  }
+  .title-drama {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-weight: 400;
+    font-size: clamp(5rem, 18vw, 20rem);
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: var(--bone);
+    transform-origin: left bottom;
+  }
+  .title-confa {
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: clamp(5rem, 18vw, 20rem);
+    line-height: 0.8;
+    letter-spacing: -0.05em;
+    color: var(--signal);
+    transform-origin: right top;
+    text-shadow: 0 0 80px rgba(255,30,60,0.4);
+  }
+  .title-drama .char, .title-confa .char {
+    display: inline-block;
+    transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.2, 1), opacity 0.6s;
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  .revealed .title-drama .char, .revealed .title-confa .char {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .s1-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    text-align: center;
+    z-index: 5;
+    pointer-events: none;
+  }
+  .tagline {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.6em;
+    color: var(--ash);
+    text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+    opacity: 0;
+    transition: opacity 1.2s 0.8s;
+  }
+  .revealed .tagline { opacity: 1; }
+  .tagline::before, .tagline::after {
+    content: '';
+    display: inline-block;
+    width: 2em;
+    height: 1px;
+    background: var(--signal);
+    vertical-align: middle;
+    margin: 0 1em;
+  }
+  .tagline .accent { color: var(--signal); font-style: italic; font-family: 'Georgia', serif; letter-spacing: 0; }
+
+  /* small index numbers floating */
+  .idx {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.25em;
+    color: var(--ash);
+    opacity: 0.5;
+  }
+  .idx.i1 { top: 3rem; right: 12rem; }
+  .idx.i2 { bottom: 3rem; left: 12rem; }
+  .idx.i3 { top: 45%; left: 3rem; transform: rotate(-90deg); transform-origin: left; }
+
+  /* ---------- SCENE 2 : MANIFESTO ---------- */
+  .s2 {
+    padding-top: 20vh;
+    padding-bottom: 20vh;
+  }
+  .manifest {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .manifest .kicker {
+    font-size: 0.65rem;
+    letter-spacing: 0.6em;
+    color: var(--signal);
+    text-transform: uppercase;
+    margin-bottom: 4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1s;
+  }
+  .revealed .manifest .kicker { opacity: 1; transform: translateY(0); }
+
+  .manifest .line {
+    font-family: 'Georgia', serif;
+    font-weight: 400;
+    font-size: clamp(1.6rem, 3.4vw, 3.2rem);
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+    overflow: hidden;
+  }
+  .manifest .line .word {
+    display: inline-block;
+    margin-right: 0.35em;
+  }
+  .manifest .line .word .char {
+    display: inline-block;
+    transform: translateY(110%);
+    transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .revealed .manifest .line .word .char {
+    transform: translateY(0);
+  }
+  .manifest .line em {
+    font-style: italic;
+    color: var(--signal);
+  }
+  .manifest .line .strike {
+    text-decoration: line-through;
+    text-decoration-color: var(--signal);
+    text-decoration-thickness: 2px;
+    color: var(--ash);
+  }
+
+  .manifest .signoff {
+    margin-top: 6rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    color: var(--ash);
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 1.2s 1.5s;
+  }
+  .revealed .manifest .signoff { opacity: 0.7; transform: translateY(0); }
+  .manifest .signoff .num { color: var(--signal); }
+
+  /* ---------- MARQUEE BAND ---------- */
+  .marquee-band {
+    position: relative;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--faint);
+    border-bottom: 1px solid var(--faint);
+    overflow: hidden;
+    background: var(--deep);
+  }
+  .marquee-track {
+    display: flex;
+    white-space: nowrap;
+    animation: marquee 40s linear infinite;
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    line-height: 1;
+    color: var(--bone);
+  }
+  .marquee-track .item {
+    padding: 0 2rem;
+    display: inline-flex;
+    align-items: center;
+  }
+  .marquee-track .sep {
+    color: var(--signal);
+    padding: 0 2rem;
+    font-style: normal;
+  }
+  .marquee-track .item:nth-child(even) { color: var(--ash); }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ---------- SCENE 3 : LINKS ---------- */
+  .s3 {
+    padding: 10vh 0 0 0;
+  }
+  .s3-head {
+    padding: 0 6vw 5vh 6vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 1px solid var(--faint);
+  }
+  .s3-head .label {
+    font-size: 0.65rem;
+    letter-spacing: 0.6em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+  .s3-head .num {
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    color: var(--signal);
+  }
+
+  .link-block {
+    position: relative;
+    padding: 8vh 6vw;
+    border-bottom: 1px solid var(--faint);
+    overflow: hidden;
+    cursor: none;
+    transition: background 0.6s ease;
+  }
+  .link-block:hover {
+    background: linear-gradient(90deg, rgba(163,0,26,0.08) 0%, transparent 70%);
+  }
+  .link-block-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 4vw;
+    transition: transform 0.5s cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  .link-block:hover .link-block-inner {
+    transform: translateX(2vw);
+  }
+
+  .link-wordmark {
+    font-family: 'Georgia', serif;
+    font-weight: 400;
+    font-size: clamp(4rem, 14vw, 13rem);
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+    color: var(--bone);
+    transition: color 0.6s, letter-spacing 0.8s cubic-bezier(0.2, 0.9, 0.2, 1);
+    white-space: nowrap;
+  }
+  .link-block:hover .link-wordmark {
+    color: var(--signal);
+    letter-spacing: 0.02em;
+  }
+  .link-block .num-big {
+    font-family: 'Courier New', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.3em;
+    color: var(--signal);
+    margin-bottom: 1.5rem;
+  }
+  .link-block .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+    margin-top: 2rem;
+  }
+  .link-block .addr {
+    font-family: 'Courier New', monospace;
+    color: var(--bone);
+    font-size: 0.85rem;
+    letter-spacing: 0.15em;
+    text-transform: none;
+  }
+  .link-block .arrow {
+    font-size: 2rem;
+    color: var(--ash);
+    transition: color 0.5s, transform 0.5s;
+    line-height: 1;
+  }
+  .link-block:hover .arrow {
+    color: var(--signal);
+    transform: translateX(10px);
+  }
+
+  .link-block .glitch-cover {
+    position: absolute;
+    inset: 0;
+    background: var(--signal);
+    transform: translateX(-101%);
+    transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .link-block:hover .glitch-cover {
+    transform: translateX(101%);
+  }
+  .link-block-inner { position: relative; z-index: 2; }
+
+  /* ---------- SCENE 4 : FOOTER / SIGNATURE ---------- */
+  .s4 {
+    padding: 15vh 6vw 6vh 6vw;
+    min-height: 80vh;
+    justify-content: space-between;
+  }
+  .s4-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6vw;
+    align-items: start;
+  }
+  .closing-text {
+    font-family: 'Georgia', serif;
+    font-style: italic;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    line-height: 1.4;
+    color: var(--ash);
+    max-width: 520px;
+  }
+  .closing-text em {
+    font-style: normal;
+    color: var(--bone);
+    font-weight: 400;
+  }
+  .sigil-big {
+    font-family: 'Georgia', serif;
+    font-weight: 400;
+    font-size: clamp(8rem, 20vw, 18rem);
+    line-height: 0.85;
+    color: var(--bone);
+    letter-spacing: -0.05em;
+    text-align: right;
+    position: relative;
+  }
+  .sigil-big .ghost {
+    position: absolute;
+    inset: 0;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--signal);
+    opacity: 0.5;
+    animation: ghostDrift 6s ease-in-out infinite;
+  }
+  @keyframes ghostDrift {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(8px, -4px); }
+  }
+  .sigil-big .sub {
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    color: var(--ash);
+    margin-top: 1.5rem;
+    text-align: right;
+    font-style: normal;
+    -webkit-text-stroke: 0;
+  }
+
+  .s4-bottom {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    padding-top: 4rem;
+    border-top: 1px solid var(--faint);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    color: var(--ash);
+    text-transform: uppercase;
+  }
+  .s4-bottom .col strong {
+    display: block;
+    color: var(--bone);
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.4em;
+  }
+  .s4-bottom .col span {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-family: 'Courier New', monospace;
+    text-transform: none;
+    letter-spacing: 0.1em;
+  }
+  .s4-bottom .red { color: var(--signal); }
+
+  /* glyph that rotates */
+  .rotglyph {
+    display: inline-block;
+    font-family: 'Georgia', serif;
+    color: var(--signal);
+    animation: rotGlyph 20s linear infinite;
+    font-size: 1.2em;
+    margin: 0 0.4em;
+  }
+  @keyframes rotGlyph {
+    from { transform: rotate(0); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ---------- CURSOR ---------- */
+  .cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 200;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+  .cursor-dot {
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--signal);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s;
+  }
+  .cursor-ring {
+    position: absolute;
+    width: 40px; height: 40px;
+    border: 1px solid var(--bone);
+    border-radius: 50%;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.35s cubic-bezier(0.2, 0.9, 0.2, 1);
+  }
+  .cursor-label {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Courier New', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    color: var(--bone);
+    opacity: 0;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+  }
+  .cursor.mode-link .cursor-ring {
+    width: 90px; height: 90px;
+    background: var(--signal);
+    border-color: var(--signal);
+    mix-blend-mode: normal;
+  }
+  .cursor.mode-link .cursor-dot { opacity: 0; }
+  .cursor.mode-link .cursor-label { opacity: 1; color: var(--void); font-weight: bold; }
+
+  .cursor.mode-text .cursor-ring {
+    width: 4px; height: 28px;
+    border-radius: 0;
+    border: none;
+    background: var(--signal);
+    animation: textBlink 1s infinite;
+  }
+  .cursor.mode-text .cursor-dot { opacity: 0; }
+  @keyframes textBlink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  /* ---------- SCROLL PROGRESS ---------- */
+  .progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 1px;
+    background: var(--signal);
+    z-index: 100;
+    width: 0%;
+    box-shadow: 0 0 10px var(--signal);
+  }
+
+  /* ---------- GLITCH FLASH ---------- */
+  .flash {
+    position: fixed;
+    inset: 0;
+    background: var(--signal);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 95;
+    mix-blend-mode: difference;
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 860px) {
+    body { cursor: auto; }
+    .cursor { display: none; }
+    .sigil, .marker { top: 1.2rem; font-size: 0.55rem; }
+    .sigil { right: 1.2rem; }
+    .marker { left: 1.2rem; letter-spacing: 0.3em; }
+    .scene { padding: 6vh 5vw; }
+    .s1-grid { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+    .s1-left, .s1-right { padding: 3vh 5vw; }
+    .s1-right { align-items: flex-end; justify-content: flex-start; }
+    .title-drama, .title-confa { font-size: clamp(4rem, 22vw, 7rem); }
+    .idx { display: none; }
+    .s3-head { flex-direction: column; align-items: flex-start; gap: 0.5rem; padding: 0 5vw 3vh 5vw; }
+    .link-block { padding: 5vh 5vw; }
+    .link-wordmark { font-size: clamp(3rem, 16vw, 5rem); }
+    .link-block .meta-row { flex-direction: column; align-items: flex-start; gap: 1rem; margin-top: 1.5rem; }
+    .s4-top { grid-template-columns: 1fr; gap: 4rem; }
+    .sigil-big { text-align: left; font-size: clamp(6rem, 24vw, 10rem); }
+    .sigil-big .sub { text-align: left; }
+    .s4-bottom { grid-template-columns: 1fr 1fr; font-size: 0.6rem; }
+    .marquee-band { padding: 1.5rem 0; }
+  }
+
+  .sigil {
+    text-decoration: none;
+    cursor: none;
+    transition: color 0.3s;
+  }
+  .sigil:hover { color: var(--signal); }
+  .sigil:hover .num { color: var(--signal); text-decoration: underline; text-underline-offset: 4px; }
+
+
+</style>
+</head>
+<body>
+
+<canvas id="grain"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="flash" id="flash"></div>
+<div class="progress" id="progress"></div>
+
+<div class="marker"><span class="dot"></span>3.500 onlaina blyat!</div>
+<a href="secret.html" class="sigil" title="restricted sector">134/134 (CLICK) <span class="num">134</span></a>
+
+<!-- ============ SCENE 1 : OPENING ============ -->
+<section class="scene s1" id="s1">
+  <div class="s1-grid">
+    <div class="s1-left">
+      <h1 class="title-drama" data-split>DRAMA</h1>
+      <span class="idx i3">§ 001 / SCROLL DOWN</span>
+    </div>
+    <div class="s1-right">
+      <h1 class="title-confa" data-split>CONFA</h1>
+    </div>
+  </div>
+  <div class="s1-center">
+    <div class="tagline">
+      REALITY <span class="accent">vibecoded</span> WRONG
+    </div>
+  </div>
+  <span class="idx i1">лол</span>
+  <span class="idx i2">кек</span>
+</section>
+
+<!-- ============ MARQUEE ============ -->
+<div class="marquee-band">
+  <div class="marquee-track">
+    <div class="item">site is vibecoded</div><span class="sep">✶</span>
+    <div class="item">dramaconfa top</div><span class="sep">✶</span>
+    <div class="item">fedya booker chmo</div><span class="sep">✶</span>
+    <div class="item">enter at your own frequency</div><span class="sep">✶</span>
+    <div class="item">Sign contract</div><span class="sep">✶</span>
+    <div class="item">Please sign</div><span class="sep">✶</span>
+    <div class="item">reality is the noise</div><span class="sep">✶</span>
+    <div class="item">enter at your own frequency</div><span class="sep">✶</span>
+  </div>
+</div>
+
+<!-- ============ SCENE 2 : MANIFESTO ============ -->
+<section class="scene s2" id="s2" data-reveal>
+  <div class="manifest">
+    <div class="kicker">— начало, 00:04 am</div>
+    <p class="line" data-split-word>ловля <em>квиконсов</em> в этом лесу.</p>
+    <p class="line" data-split-word>ЕДИНСТВЕННЫЙ РЭПЕР (йоу) <span class="strike">ДА Я ЕДИНСТВЕННЫЙ РЭПЕР</span> (да).</p>
+    <p class="line" data-split-word>и мы с тобою будем вместе <em>как Гуф и Айза</em>.</p>
+    <p class="line" data-split-word>ну уже душно <em>от таких</em> текстов.</p>
+    <div class="signoff">— канец <span class="num">134</span> <span class="rotglyph">✦</span></div>
+  </div>
+</section>
+
+<!-- ============ SCENE 3 : LINKS ============ -->
+<section class="scene s3" id="s3">
+  <div class="s3-head">
+    <div class="label">— transmissions / enter via</div>
+    <div class="num">§ 002</div>
+  </div>
+
+  <a href="https://t.me/dramaconfa" target="_blank" rel="noopener" class="link-block" data-magnetic data-hover="link">
+    <div class="glitch-cover"></div>
+    <div class="link-block-inner">
+      <div>
+        <div class="num-big">TRANSMISSION · 01</div>
+        <div class="link-wordmark">TELEGRAM</div>
+        <div class="meta-row">
+          <div>CHANNEL · PUBLIC · DAILY</div>
+          <div class="addr">t.me/dramaconfa</div>
+        </div>
+      </div>
+      <div class="arrow">↗</div>
+    </div>
+  </a>
+
+  <a href="https://discord.com/invite/zBnPuZNUjP target="_blank" rel="noopener" class="link-block" data-magnetic data-hover="link">
+    <div class="glitch-cover"></div>
+    <div class="link-block-inner">
+      <div>
+        <div class="num-big">TRANSMISSION · 02</div>
+        <div class="link-wordmark">DISCORD</div>
+        <div class="meta-row">
+          <div>SERVER · LIVE · VOICE</div>
+          <div class="addr">discord · dramaconfa</div>
+        </div>
+      </div>
+      <div class="arrow">↗</div>
+    </div>
+  </a>
+</section>
+
+<!-- ============ SCENE 4 : SIGNATURE ============ -->
+<section class="scene s4" id="s4">
+  <div class="s4-top">
+    <div class="closing-text">
+      <em>nothing on this page is permanent.</em> the channels drift, the rooms rename themselves, the frequencies shift. what you see here is a frame — captured, compressed, sent forward. if you're reading this, the copy reached you.
+    </div>
+    <div class="sigil-big">
+      134
+      <span class="ghost">134</span>
+      <span class="sub">— END OF BROADCAST</span>
+    </div>
+  </div>
+
+  <div class="s4-bottom">
+    <div class="col">
+      <strong>ORIGIN</strong>
+      <span>filed 2024 — now</span>
+      <span>node 04 · sector 13</span>
+      <span class="red">status · active</span>
+    </div>
+    <div class="col">
+      <strong>CHANNELS</strong>
+      <span>telegram · dramaconfa</span>
+      <span>discord · dramaconfa</span>
+    </div>
+    <div class="col">
+      <strong>RULES</strong>
+      <span>01. no silence</span>
+      <span>02. no originals</span>
+      <span>03. keep the copy</span>
+    </div>
+    <div class="col">
+      <strong>COLOPHON</strong>
+      <span>written in static</span>
+      <span>designed by <span class="red">134</span></span>
+      <span>v 0.4 · corrupted</span>
+    </div>
+  </div>
+</section>
+
+<div class="cursor" id="cursor">
+  <div class="cursor-ring"></div>
+  <div class="cursor-dot"></div>
+  <div class="cursor-label">ENTER</div>
+</div>
+
+<script>
+/* ============ SPLIT TEXT INTO CHARS ============ */
+document.querySelectorAll('[data-split]').forEach(el => {
+  const text = el.textContent;
+  el.innerHTML = '';
+  text.split('').forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.className = 'char';
+    span.textContent = ch === ' ' ? '\u00A0' : ch;
+    span.style.transitionDelay = (i * 0.045) + 's';
+    el.appendChild(span);
+  });
+});
+
+document.querySelectorAll('[data-split-word]').forEach(el => {
+  const html = el.innerHTML;
+  // preserve inline elements (em, span) while wrapping words/chars
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  el.innerHTML = '';
+
+  function walk(node) {
+    if (node.nodeType === 3) {
+      const words = node.textContent.split(/(\s+)/);
+      words.forEach(w => {
+        if (/^\s+$/.test(w)) {
+          el.appendChild(document.createTextNode(' '));
+          return;
+        }
+        if (w === '') return;
+        const word = document.createElement('span');
+        word.className = 'word';
+        w.split('').forEach((c, i) => {
+          const ch = document.createElement('span');
+          ch.className = 'char';
+          ch.textContent = c;
+          ch.style.transitionDelay = (i * 0.015) + 's';
+          word.appendChild(ch);
+        });
+        el.appendChild(word);
+        el.appendChild(document.createTextNode(' '));
+      });
+    } else {
+      // element node - keep it, wrap its text inside
+      const wrapper = node.cloneNode(false);
+      el.appendChild(wrapper);
+      node.childNodes.forEach(child => {
+        if (child.nodeType === 3) {
+          const words = child.textContent.split(/(\s+)/);
+          words.forEach(w => {
+            if (/^\s+$/.test(w) || w === '') {
+              wrapper.appendChild(document.createTextNode(w));
+              return;
+            }
+            const word = document.createElement('span');
+            word.className = 'word';
+            w.split('').forEach((c, i) => {
+              const ch = document.createElement('span');
+              ch.className = 'char';
+              ch.textContent = c;
+              ch.style.transitionDelay = (i * 0.015) + 's';
+              word.appendChild(ch);
+            });
+            wrapper.appendChild(word);
+            wrapper.appendChild(document.createTextNode(' '));
+          });
+        } else {
+          wrapper.appendChild(child);
+        }
+      });
+    }
+  }
+  tmp.childNodes.forEach(n => walk(n));
+});
+
+/* ============ REVEAL ON SCROLL ============ */
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('revealed');
+    }
+  });
+}, { threshold: 0.2 });
+
+document.querySelectorAll('[data-reveal]').forEach(el => revealObserver.observe(el));
+
+// auto-reveal scene 1
+setTimeout(() => document.getElementById('s1').classList.add('revealed'), 200);
+
+/* ============ CUSTOM CURSOR ============ */
+const cursor = document.getElementById('cursor');
+let mx = 0, my = 0, cx = 0, cy = 0;
+const isMobile = window.matchMedia('(max-width: 860px)').matches;
+
+if (!isMobile) {
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+  });
+
+  function cursorLoop() {
+    cx += (mx - cx) * 0.22;
+    cy += (my - cy) * 0.22;
+    cursor.style.left = cx + 'px';
+    cursor.style.top = cy + 'px';
+    requestAnimationFrame(cursorLoop);
+  }
+  cursorLoop();
+
+  // hover modes
+  document.querySelectorAll('[data-hover]').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('mode-' + el.dataset.hover));
+    el.addEventListener('mouseleave', () => cursor.className = 'cursor');
+  });
+
+  // manifesto gets text cursor
+  document.querySelectorAll('.manifest').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('mode-text'));
+    el.addEventListener('mouseleave', () => cursor.className = 'cursor');
+  });
+
+  // magnetic effect on link blocks
+  document.querySelectorAll('[data-magnetic]').forEach(el => {
+    const inner = el.querySelector('.link-block-inner');
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const dx = e.clientX - (rect.left + rect.width / 2);
+      const dy = e.clientY - (rect.top + rect.height / 2);
+      inner.style.transform = `translate(${dx * 0.04}px, ${dy * 0.06}px)`;
+    });
+    el.addEventListener('mouseleave', () => {
+      inner.style.transform = 'translate(0, 0)';
+    });
+  });
+}
+
+/* ============ SCROLL PROGRESS ============ */
+const progressBar = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+  progressBar.style.width = (scrolled * 100) + '%';
+});
+
+/* ============ PARALLAX ON SIGIL ============ */
+if (!isMobile) {
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    const sigilBig = document.querySelector('.sigil-big .ghost');
+    if (sigilBig) {
+      sigilBig.style.transform = `translate(${Math.sin(y * 0.005) * 10}px, ${Math.cos(y * 0.003) * 8}px)`;
+    }
+  });
+}
+
+/* ============ GRAIN (canvas) ============ */
+const grain = document.getElementById('grain');
+const gctx = grain.getContext('2d');
+function resizeGrain() {
+  grain.width = window.innerWidth / 3;
+  grain.height = window.innerHeight / 3;
+}
+resizeGrain();
+window.addEventListener('resize', resizeGrain);
+
+function renderGrain() {
+  const w = grain.width, h = grain.height;
+  const img = gctx.createImageData(w, h);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = Math.random() * 255;
+    img.data[i] = v; img.data[i+1] = v; img.data[i+2] = v; img.data[i+3] = 255;
+  }
+  gctx.putImageData(img, 0, 0);
+}
+setInterval(renderGrain, 100);
+renderGrain();
+
+/* ============ OCCASIONAL GLITCH FLASH ============ */
+const flash = document.getElementById('flash');
+function flashGlitch() {
+  flash.animate([
+    { opacity: 0 },
+    { opacity: 0.08, transform: 'translateX(3px)' },
+    { opacity: 0, transform: 'translateX(-2px)' },
+    { opacity: 0.05 },
+    { opacity: 0 }
+  ], { duration: 280, easing: 'steps(4)' });
+
+  // distort title briefly
+  const drama = document.querySelector('.title-drama');
+  if (drama) {
+    drama.animate([
+      { transform: 'translate(0,0)' },
+      { transform: 'translate(-3px, 1px) skewX(-2deg)' },
+      { transform: 'translate(2px, -1px)' },
+      { transform: 'translate(0,0)' }
+    ], { duration: 350, easing: 'steps(3)' });
+  }
+
+  setTimeout(flashGlitch, 6000 + Math.random() * 12000);
+}
+setTimeout(flashGlitch, 3000);
+
+/* ============ SCENE 2 REVEAL ============ */
+// scene 2 reveals when in view
+revealObserver.observe(document.getElementById('s2'));
+
+</script>
+</body>
+</html>
