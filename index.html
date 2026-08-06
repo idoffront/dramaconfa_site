@@ -134,7 +134,8 @@
   }
 
   /* ---------- SCENE 1 : OPENING (dramaconfa) ---------- */
-  .s1 {
+ /* ---------- SCENE 1 : OPENING (финальное исправление) ---------- */
+.s1 {
   padding: 0;
 }
 .s1-grid {
@@ -146,16 +147,14 @@
   justify-content: center;
 }
 .s1-title-wrap {
-  /* ... базовые стили выше ... */
-  transform: rotate(-3deg); /* лёгкий наклон всей пары */
+  position: relative;
+  text-align: center;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;    /* ← вертикальный стек */
+  align-items: center;       /* ← центрирование по горизонтали */
 }
 .title-drama {
-  transform: translateX(8%); /* сдвиг вправо */
-}
-.title-confa {
-  transform: translateX(-8%); /* сдвиг влево */
-}
- .title-drama {
   font-family: 'Archivo Black', sans-serif;
   font-weight: 400;
   font-size: clamp(4rem, 16vw, 18rem);
@@ -164,9 +163,11 @@
   color: var(--bone);
   white-space: nowrap;
   display: block;
+  margin: 0;                 /* ← сброс любых внешних отступов h1 */
 }
 .title-confa {
   font-family: 'Archivo Black', sans-serif;
+  font-style: italic;
   font-weight: 400;
   font-size: clamp(4rem, 16vw, 18rem);
   line-height: 1;
@@ -175,7 +176,7 @@
   text-shadow: 0 0 80px rgba(255,30,60,0.4);
   white-space: nowrap;
   display: block;
-  margin-top: 0;
+  margin: 0;                 /* ← сброс любых внешних отступов h1 */
 }
   .title-drama .char, .title-confa .char {
     display: inline-block;
