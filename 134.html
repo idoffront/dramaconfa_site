@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>134 — рай</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><circle cx='32' cy='32' r='30' fill='%23ffffff' stroke='%23c9cdd9' stroke-width='2'/><text x='32' y='42' font-family='Georgia' font-size='22' fill='%23aeb3c6' text-anchor='middle'>134</text></svg>">
+<style>
+/* ============================================================
+   134 — РАЙ
+   ангельская операционная система, поражённая сбоем
+   ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --ink: #8b90a3;
+  --ink-faint: #a9adbd;
+  --line: rgba(170, 175, 198, 0.28);
+  --gold: rgba(255, 244, 222, 0.85);
+  --red: #ff0033;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: radial-gradient(circle at 50% 30%, #ffffff 0%, #f6f7fa 55%, #e9ebf2 100%);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+@media (pointer: fine) {
+  body, a, #numWrap { cursor: none; }
+}
+
+/* ============================================================
+   МИР (контейнер, к которому применяется инверсия)
+   ============================================================ */
+.world {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+.world.invert { filter: invert(1) hue-rotate(160deg); }
+.world.shake { animation: shake 0.3s steps(3); }
+@keyframes shake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-9px, 5px); }
+  40% { transform: translate(7px, -7px); }
+  60% { transform: translate(-6px, -3px); }
+  80% { transform: translate(8px, 6px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ============================================================
+   АТМОСФЕРА: лучи, облака, архитектура
+   ============================================================ */
+.rays {
+  position: fixed;
+  top: -30%; left: 50%;
+  width: 165vmax; height: 165vmax;
+  transform: translateX(-50%);
+  background: conic-gradient(from 0deg,
+    transparent 0deg, rgba(255,250,238,.45) 6deg, transparent 14deg,
+    transparent 92deg, rgba(255,250,238,.3) 98deg, transparent 106deg,
+    transparent 204deg, rgba(255,250,238,.4) 210deg, transparent 218deg,
+    transparent 322deg, rgba(255,250,238,.28) 328deg, transparent 336deg);
+  opacity: 0.4;
+  filter: blur(2px);
+  animation: raysSpin 100s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes raysSpin {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(360deg); }
+}
+
+.cloud {
+  position: fixed;
+  z-index: 2;
+  border-radius: 50%;
+  filter: blur(48px);
+  pointer-events: none;
+}
+.c1 { width: 60vmax; height: 24vmax; top: -8%; left: -12%; background: rgba(255,255,255,0.9); animation: drift1 70s ease-in-out infinite alternate; }
+.c2 { width: 50vmax; height: 20vmax; bottom: -6%; right: -10%; background: rgba(244,246,252,0.85); animation: drift2 85s ease-in-out infinite alternate; }
+.c3 { width: 34vmax; height: 16vmax; top: 30%; right: 16%; background: rgba(255,250,240,0.5); animation: drift3 60s ease-in-out infinite alternate; }
+@keyframes drift1 { to { transform: translateX(9vw); } }
+@keyframes drift2 { to { transform: translateX(-8vw); } }
+@keyframes drift3 { to { transform: translate(-6vw, 3vh); } }
+
+.arch {
+  position: fixed;
+  z-index: 3;
+  left: 50%; top: 58%;
+  width: 70vmin; height: 35vmin;
+  transform: translate(-50%, -100%);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 35vmin 35vmin 0 0;
+  pointer-events: none;
+}
+.arch-2 { width: 98vmin; height: 49vmin; border-color: rgba(170,175,198,0.15); }
+
+.floor {
+  position: fixed;
+  z-index: 3;
+  left: -25%; right: -25%; bottom: -4%;
+  height: 42%;
+  background-image:
+    linear-gradient(rgba(168,173,196,0.13) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(168,173,196,0.13) 1px, transparent 1px);
+  background-size: 64px 64px;
+  transform: perspective(520px) rotateX(64deg);
+  transform-origin: top center;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 26%, transparent 96%);
+  mask-image: linear-gradient(to bottom, transparent, #000 26%, transparent 96%);
+  pointer-events: none;
+}
+
+.sweep {
+  position: fixed;
+  top: -20%; left: -40%;
+  width: 26%; height: 150%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.95), transparent);
+  transform: rotate(16deg);
+  filter: blur(7px);
+  opacity: 0;
+  z-index: 14;
+  pointer-events: none;
+  animation: sweep 27s ease-in-out infinite;
+}
+@keyframes sweep {
+  0%, 74% { left: -40%; opacity: 0; }
+  78% { opacity: 0.6; }
+  88% { opacity: 0.6; }
+  96%, 100% { left: 135%; opacity: 0; }
+}
+
+/* ============================================================
+   СТЕКЛЯННЫЕ ОБЪЕКТЫ
+   ============================================================ */
+.gw { position: fixed; z-index: 5; pointer-events: none; }
+.glass {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255,255,255,0.62), rgba(255,255,255,0.12));
+  border: 1px solid rgba(255,255,255,0.85);
+  box-shadow: 0 30px 60px rgba(150,155,180,0.16), inset 0 1px 0 rgba(255,255,255,0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: glassFloat var(--dur, 10s) ease-in-out infinite;
+}
+@keyframes glassFloat {
+  0%, 100% { transform: translateY(0) rotate(var(--r0, 0deg)); }
+  50% { transform: translateY(-15px) rotate(var(--r1, 0deg)); }
+}
+.gs1 { width: 110px; height: 165px; border-radius: 22px; --r0: -4deg; --r1: 2deg; --dur: 11s; }
+.gs2 { width: 86px; height: 86px; border-radius: 50%; --dur: 9s; background: radial-gradient(circle at 32% 30%, rgba(255,255,255,0.85), rgba(255,255,255,0.15) 70%); }
+.gs3 { width: 150px; height: 92px; border-radius: 18px; --r0: 3deg; --r1: -2deg; --dur: 13s; }
+.gs4 { width: 58px; height: 185px; border-radius: 30px; --r0: -2deg; --r1: 3deg; --dur: 12s; }
+.gs5 { width: 190px; height: 2px; border-radius: 0; --r0: -18deg; --r1: -13deg; --dur: 10s; box-shadow: 0 12px 30px rgba(150,155,180,0.18); }
+.gs6 { width: 74px; height: 74px; border-radius: 14px; --r0: 45deg; --r1: 51deg; --dur: 14s; }
+
+/* ============================================================
+   СИМВОЛЫ
+   ============================================================ */
+.glyphs { position: fixed; inset: 0; z-index: 4; pointer-events: none; }
+.glyphs span {
+  position: absolute;
+  color: #b6bac9;
+  font-size: 0.75rem;
+  opacity: 0.2;
+  animation: glimmer 5s ease-in-out infinite;
+}
+.glyphs span:nth-child(2n) { animation-duration: 7s; }
+.glyphs span:nth-child(3n) { animation-delay: 1.4s; }
+@keyframes glimmer { 0%, 100% { opacity: 0.12; } 50% { opacity: 0.55; } }
+
+/* ============================================================
+   ПЫЛЬ (canvas)
+   ============================================================ */
+#dust { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 12; pointer-events: none; }
+
+/* ============================================================
+   МОНОЛИТ 134
+   ============================================================ */
+.center-col {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.monument { position: relative; }
+.monument-inner { position: relative; }
+
+.halo {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 92vmin; height: 92vmin;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, var(--gold) 0%, rgba(255,244,222,0.25) 38%, transparent 68%);
+  animation: haloBreath 9s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
+}
+@keyframes haloBreath {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.85; }
+  50% { transform: translate(-50%, -50%) scale(1.12); opacity: 1; }
+}
+
+.beam {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 78vmin; height: 1px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, transparent, rgba(205,192,158,0.55), transparent);
+  z-index: 0;
+  animation: beamPulse 6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes beamPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+
+.ring {
+  position: absolute;
+  top: 50%; left: 50%;
+  border: 1px solid rgba(150,155,182,0.3);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+.ring::before {
+  content: '';
+  position: absolute;
+  top: -3px; left: 50%;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 12px rgba(255,255,255,0.95), 0 0 4px rgba(205,185,140,0.9);
+}
+.r1 { width: 46vmin; height: 46vmin; --tilt: 74deg; animation: ringSpin 30s linear infinite; }
+.r2 { width: 60vmin; height: 60vmin; --tilt: 67deg; border-color: rgba(150,155,182,0.22); animation: ringSpin 46s linear infinite reverse; }
+.r3 { width: 76vmin; height: 76vmin; --tilt: 80deg; border-color: rgba(150,155,182,0.16); animation: ringSpin 64s linear infinite; }
+@keyframes ringSpin {
+  from { transform: translate(-50%, -50%) rotateX(var(--tilt)) rotateZ(0deg); }
+  to { transform: translate(-50%, -50%) rotateX(var(--tilt)) rotateZ(360deg); }
+}
+
+.cross {
+  position: absolute;
+  top: -12vmin; left: 50%;
+  width: 14px; height: 14px;
+  transform: translateX(-50%);
+  opacity: 0.6;
+  z-index: 3;
+  animation: floatY 9s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+.cross::before { content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 100%; background: #b9bece; }
+.cross::after { content: ''; position: absolute; top: 50%; left: 0; width: 100%; height: 1px; background: #b9bece; }
+
+.float-wrap { animation: floatY 7.5s ease-in-out infinite; }
+@keyframes floatY {
+  0%, 100% { transform: translateY(-9px); }
+  50% { transform: translateY(9px); }
+}
+
+.num-wrap {
+  position: relative;
+  display: inline-block;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.bignum {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(7rem, 26vw, 24rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  display: inline-block;
+}
+
+.num {
+  position: relative;
+  z-index: 2;
+  background: linear-gradient(180deg, #ffffff 0%, #e7e9f0 45%, #b4b8c8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  filter: drop-shadow(0 26px 42px rgba(140,145,172,0.3));
+}
+
+.ghost {
+  position: absolute;
+  top: 0; left: 0;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.07s, transform 0.07s;
+}
+.gr { color: var(--red); }
+.gc { color: #00f0ff; }
+.world.split .gr { opacity: 0.8; transform: translate(-7px, 3px); }
+.world.split .gc { opacity: 0.8; transform: translate(7px, -3px); }
+
+.num-wrap.pulse { animation: numPulse 0.55s cubic-bezier(0.2, 0.9, 0.2, 1); }
+@keyframes numPulse {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.045); }
+  100% { transform: scale(1); }
+}
+
+.num-wrap.possessed { animation: possessed 0.12s steps(2) infinite; }
+.num-wrap.possessed .ghost { opacity: 0.95; }
+.num-wrap.possessed .gr { transform: translate(-13px, 5px) skewX(-8deg); }
+.num-wrap.possessed .gc { transform: translate(13px, -5px) skewX(8deg); }
+@keyframes possessed {
+  0% { transform: translate(0, 0) skewX(0); }
+  25% { transform: translate(-9px, 5px) skewX(-9deg) scaleY(1.04); }
+  50% { transform: translate(7px, -6px) skewX(7deg); }
+  75% { transform: translate(-5px, -4px) skewX(-5deg) scaleY(0.97); }
+  100% { transform: translate(0, 0) skewX(0); }
+}
+
+/* ============================================================
+   ЦИТАТА
+   ============================================================ */
+.caption { margin-top: 6vmin; position: relative; text-align: center; max-width: 90vw; }
+.caption-inner { position: relative; padding: 0.5rem 1rem; }
+
+.quote {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: clamp(0.95rem, 1.4vw, 1.2rem);
+  letter-spacing: 0.12em;
+  color: var(--ink);
+}
+
+.quote-ghost {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', monospace;
+  font-size: clamp(0.7rem, 1.1vw, 0.9rem);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+  background: rgba(255,255,255,0.85);
+  opacity: 0;
+  transition: opacity 0.08s;
+}
+.quote-ghost.show { opacity: 1; }
+
+#awakened {
+  margin-top: 1.8rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--red);
+  opacity: 0;
+  transition: opacity 2.5s;
+}
+#awakened.show { opacity: 0.75; }
+
+/* ============================================================
+   HUD
+   ============================================================ */
+.hud {
+  position: fixed;
+  z-index: 20;
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  line-height: 2;
+}
+.hud .val {
+  display: block;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 0.15em;
+  color: var(--ink);
+}
+.hud-tl { top: 3vh; left: 4vw; }
+.hud-tr { top: 3vh; right: 4vw; text-align: right; }
+.hud-bl { bottom: 3vh; left: 4vw; }
+.hud-br { bottom: 3vh; right: 4vw; text-align: right; }
+
+#hint {
+  position: fixed;
+  bottom: 9vh; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  z-index: 20;
+  opacity: 0;
+  transition: opacity 1.5s;
+}
+#hint.show { opacity: 0.55; }
+#hint.hide { opacity: 0 !important; transition: opacity 0.6s; }
+
+.back {
+  position: fixed;
+  bottom: 3.5vh; left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.55rem;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  text-decoration: none;
+  z-index: 20;
+  opacity: 0.4;
+  transition: opacity 0.3s, color 0.3s;
+}
+.back:hover { opacity: 1; color: var(--red); }
+
+/* ============================================================
+   СБОЙ: слои разрушения
+   ============================================================ */
+#bars { position: fixed; inset: 0; z-index: 60; pointer-events: none; overflow: hidden; }
+.bar { position: absolute; left: 0; width: 100%; }
+
+#noiseCv {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: 61;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.12s;
+  mix-blend-mode: multiply;
+  image-rendering: pixelated;
+}
+#noiseCv.on { opacity: 0.3; }
+
+#mega {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 62;
+  font-family: Georgia, serif;
+  font-size: clamp(3rem, 15vw, 11rem);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+}
+#mega.on { opacity: 1; }
+
+.danger-vig {
+  position: fixed;
+  inset: 0;
+  z-index: 59;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(255,0,51,0.35) 100%);
+}
+body.danger .danger-vig { opacity: 1; }
+
+#whiteflash {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  z-index: 70;
+  pointer-events: none;
+  opacity: 0;
+}
+#whiteflash.on { animation: wf 0.9s ease-out; }
+@keyframes wf { 0% { opacity: 0; } 12% { opacity: 1; } 100% { opacity: 0; } }
+
+.ripple {
+  position: absolute;
+  width: 10px; height: 10px;
+  border: 1px solid rgba(160,165,192,0.8);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: rippleAnim 1.2s ease-out forwards;
+}
+@keyframes rippleAnim {
+  to { width: 170px; height: 170px; opacity: 0; }
+}
+
+/* ============================================================
+   ВРАТА (интро)
+   ============================================================ */
+#gate {
+  position: fixed;
+  inset: 0;
+  background: #fdfdfe;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  transition: opacity 0.8s ease;
+}
+#gate.gone { opacity: 0; pointer-events: none; }
+.gate-line {
+  width: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, #b9bece, transparent);
+  animation: gateLine 1.4s ease forwards;
+}
+@keyframes gateLine { to { width: 170px; } }
+.gate-text {
+  font-size: 0.55rem;
+  letter-spacing: 0.5em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  opacity: 0;
+  animation: gateText 1.7s ease forwards;
+}
+@keyframes gateText { 35% { opacity: 0; } 70% { opacity: 1; } 100% { opacity: 0.8; } }
+
+/* появление мира */
+.world.ready .monument-inner { animation: rise 1.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.world.ready .caption-inner { animation: rise 1.9s 0.25s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.world.ready .hud { animation: fadeHud 1.6s 0.9s both; }
+@keyframes rise {
+  from { opacity: 0; transform: translateY(26px); filter: blur(14px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+@keyframes fadeHud { from { opacity: 0; } to { opacity: 1; } }
+
+/* ============================================================
+   КУРСОР
+   ============================================================ */
+#cursor {
+  position: fixed;
+  z-index: 200;
+  width: 30px; height: 30px;
+  border: 1px solid rgba(120,125,152,0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: width 0.3s, height 0.3s, border-color 0.3s;
+}
+#cdot {
+  position: fixed;
+  z-index: 200;
+  width: 4px; height: 4px;
+  background: var(--red);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+#cursor.grow { width: 64px; height: 64px; border-color: var(--red); }
+@media (pointer: coarse) { #cursor, #cdot { display: none; } }
+
+/* ============================================================
+   АДАПТИВ
+   ============================================================ */
+@media (max-width: 720px) {
+  .bignum { font-size: clamp(5.5rem, 33vw, 10rem); }
+  .hud { font-size: 0.45rem; letter-spacing: 0.25em; }
+  .hud-tr, .hud-bl { display: none; }
+  .hide-m { display: none; }
+  .gs1 { width: 78px; height: 116px; }
+  .gs4 { width: 42px; height: 130px; }
+  .arch { width: 96vmin; }
+  #hint { bottom: 12vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rays, .sweep, .ring, .float-wrap, .glass, .halo, .cross, .cloud { animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="world" id="world">
+  <div class="rays"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+
+  <div class="arch"></div>
+  <div class="arch arch-2"></div>
+  <div class="floor"></div>
+
+  <!-- стекло -->
+  <div class="gw" data-depth="26" style="top:18%; left:13%"><div class="glass gs1"></div></div>
+  <div class="gw" data-depth="40" style="top:66%; left:9%"><div class="glass gs2"></div></div>
+  <div class="gw" data-depth="30" style="top:22%; right:14%"><div class="glass gs3"></div></div>
+  <div class="gw" data-depth="52" style="top:62%; right:11%"><div class="glass gs4"></div></div>
+  <div class="gw hide-m" data-depth="18" style="top:40%; right:27%"><div class="glass gs5"></div></div>
+  <div class="gw hide-m" data-depth="36" style="top:12%; left:42%"><div class="glass gs6"></div></div>
+
+  <!-- символы -->
+  <div class="glyphs" data-depth="20">
+    <span style="top:22%; left:26%">✧</span>
+    <span style="top:30%; right:22%">+</span>
+    <span style="top:64%; left:20%">○</span>
+    <span style="top:70%; right:26%">✦</span>
+    <span style="top:16%; left:60%">+</span>
+    <span style="top:56%; left:38%">✧</span>
+    <span style="top:44%; right:12%">·</span>
+    <span style="top:80%; left:46%">✧</span>
+  </div>
+
+  <canvas id="dust"></canvas>
+  <div class="sweep"></div>
+
+  <!-- монолит -->
+  <div class="center-col">
+    <div class="monument" data-depth="14">
+      <div class="monument-inner">
+        <div class="halo"></div>
+        <div class="beam"></div>
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <div class="cross"></div>
+        <div class="float-wrap">
+          <div class="num-wrap" id="numWrap" aria-label="134">
+            <span class="bignum ghost gr" aria-hidden="true">134</span>
+            <span class="bignum ghost gc" aria-hidden="true">134</span>
+            <span class="bignum num" id="numMain">134</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="caption" data-depth="18">
+      <div class="caption-inner">
+        <div class="quote">«Совершенство — лишь форма распада»</div>
+        <div class="quote-ghost" id="quoteGhost">даже чистейшие системы помнят шум</div>
+        <div id="awakened">ты разбудил это · оно запомнило тебя</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- hud -->
+  <div class="hud hud-tl">сектор 134<span class="val">рай · версия 7</span></div>
+  <div class="hud hud-tr">чистота<span class="val" id="purity">99.99%</span></div>
+  <div class="hud hud-bl">помехи<span class="val" id="noise">0.00%</span></div>
+  <div class="hud hud-br">вход<span class="val">не задокументирован</span></div>
+</div>
+
+<!-- слои разрушения -->
+<div class="danger-vig"></div>
+<div id="bars"></div>
+<canvas id="noiseCv"></canvas>
+<div id="mega"></div>
+<div id="whiteflash"></div>
+
+<div id="hint">коснись числа</div>
+<a class="back" href="index.html">вернуться</a>
+
+<!-- врата -->
+<div id="gate">
+  <div class="gate-line"></div>
+  <div class="gate-text">сектор 134 · вход без запроса</div>
+</div>
+
+<div id="cursor"></div>
+<div id="cdot"></div>
+
+<script>
+(function () {
+'use strict';
+
+const $ = s => document.querySelector(s);
+const world = $('#world');
+const numWrap = $('#numWrap');
+const gate = $('#gate');
+const hint = $('#hint');
+const awakenedLine = $('#awakened');
+const quoteGhost = $('#quoteGhost');
+const barsBox = $('#bars');
+const noiseCv = $('#noiseCv');
+const nctx = noiseCv.getContext('2d');
+const mega = $('#mega');
+const whiteflash = $('#whiteflash');
+const purityEl = $('#purity');
+const noiseEl = $('#noise');
+const dustCv = $('#dust');
+const dctx = dustCv.getContext('2d');
+const cursorEl = $('#cursor');
+const cdot = $('#cdot');
+
+const isTouch = matchMedia('(pointer: coarse)').matches;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const TITLE_CLEAN = '134 — рай';
+
+let noiseVal = 0, noiseBase = 0, purityVal = 99.99;
+let awakened = false, clicks = 0, lastClick = 0, mult = 1, redDust = 0;
+
+/* ---------- врата ---------- */
+setTimeout(() => { gate.classList.add('gone'); world.classList.add('ready'); }, 1700);
+setTimeout(() => gate.remove(), 2700);
+setTimeout(() => hint.classList.add('show'), 4200);
+setTimeout(() => hint.classList.add('hide'), 18000);
+
+/* ---------- пыль ---------- */
+let W, H;
+function resizeDust() { W = dustCv.width = innerWidth; H = dustCv.height = innerHeight; }
+resizeDust();
+addEventListener('resize', resizeDust);
+
+const parts = [];
+const COUNT = isTouch ? 55 : 115;
+for (let i = 0; i < COUNT; i++) {
+  parts.push({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    r: 0.6 + Math.random() * 1.8,
+    s: 0.12 + Math.random() * 0.35,
+    ph: Math.random() * Math.PI * 2,
+    a: 0.15 + Math.random() * 0.5,
+    gold: Math.random() < 0.3
+  });
+}
+function drawDust(t) {
+  dctx.clearRect(0, 0, W, H);
+  for (const p of parts) {
+    p.y -= p.s;
+    p.x += Math.sin(t * 0.0004 + p.ph) * 0.18;
+    if (p.y < -10) { p.y = H + 10; p.x = Math.random() * W; }
+    dctx.beginPath();
+    dctx.arc(p.x, p.y, p.r, 0, 6.283);
+    dctx.fillStyle = redDust > 0
+      ? `rgba(255,0,51,${p.a})`
+      : p.gold ? `rgba(206,180,128,${p.a})` : `rgba(150,155,178,${p.a * 0.8})`;
+    dctx.fill();
+  }
+  requestAnimationFrame(drawDust);
+}
+requestAnimationFrame(drawDust);
+
+/* ---------- шум (рисуется только при сбое) ---------- */
+function sizeNoise() { noiseCv.width = innerWidth / 2; noiseCv.height = innerHeight / 2; }
+sizeNoise();
+addEventListener('resize', sizeNoise);
+function drawNoise() {
+  const w = noiseCv.width, h = noiseCv.height;
+  const img = nctx.createImageData(w, h);
+  for (let i = 0; i < img.data.length; i += 4) {
+    const v = (Math.random() * 255) | 0;
+    img.data[i] = v;
+    img.data[i + 1] = v * 0.15;
+    img.data[i + 2] = v * 0.2;
+    img.data[i + 3] = 255;
+  }
+  nctx.putImageData(img, 0, 0);
+}
+
+/* ---------- звук (генерируется, без файлов) ---------- */
+let AC = null;
+function ensureAudio() {
+  if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} }
+  if (AC && AC.state === 'suspended') AC.resume();
+}
+addEventListener('pointerdown', ensureAudio);
+
+function burst(vol = 0.06, dur = 0.12) {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime;
+    const b = AC.createBuffer(1, (AC.sampleRate * dur) | 0, AC.sampleRate);
+    const d = b.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 1.6);
+    const s = AC.createBufferSource(); s.buffer = b;
+    const f = AC.createBiquadFilter(); f.type = 'bandpass';
+    f.frequency.value = 300 + Math.random() * 2600; f.Q.value = 1.4;
+    const g = AC.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    s.connect(f); f.connect(g); g.connect(AC.destination); s.start();
+  } catch (e) {}
+}
+function drone() {
+  if (!AC) return;
+  try {
+    const t = AC.currentTime;
+    const o = AC.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(58, t);
+    o.frequency.linearRampToValueAtTime(31, t + 1.4);
+    const g = AC.createGain();
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.exponentialRampToValueAtTime(0.09, t + 0.15);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 1.5);
+    o.connect(g); g.connect(AC.destination);
+    o.start(t); o.stop(t + 1.6);
+  } catch (e) {}
+}
+
+/* ---------- полосы разрушения ---------- */
+const COLORS = ['#050505', '#ff0033', '#050505', '#ff0033', '#00f0ff'];
+function spawnBars(intensity) {
+  let n = intensity === 'micro' ? 2 + ((Math.random() * 2) | 0)
+        : intensity === 'medium' ? 5 + ((Math.random() * 3) | 0)
+        : 12 + ((Math.random() * 6) | 0);
+  for (let i = 0; i < n; i++) {
+    const b = document.createElement('div');
+    b.className = 'bar';
+    b.style.top = Math.random() * 100 + '%';
+    b.style.height = (2 + Math.random() * (intensity === 'heavy' ? 60 : 26)) + 'px';
+    if (Math.random() < 0.35) {
+      b.style.left = Math.random() * 40 + '%';
+      b.style.width = 30 + Math.random() * 70 + '%';
+    }
+    b.style.background = COLORS[(Math.random() * COLORS.length) | 0];
+    if (Math.random() < 0.3) b.style.mixBlendMode = 'difference';
+    if (Math.random() < 0.25) b.style.transform = `translateX(${((Math.random() * 40 - 20) | 0)}px) skewY(${(Math.random() * 4 - 2).toFixed(1)}deg)`;
+    barsBox.appendChild(b);
+    setTimeout(() => b.remove(), 80 + Math.random() * 380);
+  }
+}
+
+/* ---------- всплески слов ---------- */
+const WORDS = ['ОНО ПОМНИТ', 'СБОЙ', 'РАЙ ПАДАЕТ', 'НЕ СМОТРИ', '134', 'ШУМ'];
+function flashWord() {
+  mega.textContent = WORDS[(Math.random() * WORDS.length) | 0];
+  mega.style.color = Math.random() < 0.6 ? '#ff0033' : '#050505';
+  mega.style.transform = `translate(-50%,-50%) translate(${((Math.random() * 60 - 30) | 0)}px,${((Math.random() * 40 - 20) | 0)}px) skewX(${((Math.random() * 24 - 12) | 0)}deg)`;
+  mega.classList.add('on');
+  setTimeout(() => mega.classList.remove('on'), 100 + Math.random() * 90);
+}
+
+function titleGlitch() {
+  document.title = '1̷3̷4̷ — с̶б̶о̶й̶';
+  setTimeout(() => document.title = TITLE_CLEAN, 500);
+}
+
+/* ---------- ядро сбоя ---------- */
+function glitch(intensity) {
+  if (REDUCED) intensity = 'micro';
+  redDust = 1; setTimeout(() => redDust = 0, 400);
+  noiseCv.classList.add('on'); drawNoise();
+  const noiseTimer = setInterval(drawNoise, 60);
+  spawnBars(intensity);
+  burst(intensity === 'micro' ? 0.04 : 0.08, 0.1 + Math.random() * 0.1);
+
+  const dur = intensity === 'micro' ? 120 : intensity === 'medium' ? 380 : 700;
+
+  if (intensity !== 'micro') {
+    world.classList.add('shake');
+    setTimeout(() => world.classList.remove('shake'), 320);
+  }
+  if (intensity === 'medium') {
+    quoteGhost.classList.add('show');
+    setTimeout(() => quoteGhost.classList.remove('show'), 240);
+  }
+  if (intensity === 'heavy') {
+    flashWord();
+    setTimeout(flashWord, 180);
+    quoteGhost.classList.add('show');
+    setTimeout(() => quoteGhost.classList.remove('show'), 420);
+    document.body.classList.add('danger');
+    setTimeout(() => document.body.classList.remove('danger'), 650);
+    titleGlitch();
+  }
+
+  const pulses = intensity === 'micro' ? 1 : intensity === 'medium' ? 2 : 3;
+  for (let i = 0; i < pulses; i++) {
+    setTimeout(() => {
+      world.classList.add('invert');
+      world.classList.add('split');
+      setTimeout(() => {
+        world.classList.remove('invert');
+        world.classList.remove('split');
+      }, 40 + Math.random() * 80);
+    }, i * (dur / pulses));
+  }
+
+  setTimeout(() => { noiseCv.classList.remove('on'); clearInterval(noiseTimer); }, dur + 80);
+
+  noiseVal = Math.min(100, noiseVal + (intensity === 'micro' ? 0.2 : intensity === 'medium' ? 0.9 : 2.4));
+  purityVal = Math.max(90, purityVal - (intensity === 'micro' ? 0.02 : intensity === 'medium' ? 0.1 : 0.5));
+}
+
+/* ---------- расписание сбоев ---------- */
+function loop() {
+  const wait = (9000 + Math.random() * 14000) * mult;
+  setTimeout(() => {
+    const r = Math.random();
+    glitch(r < 0.66 ? 'micro' : r < 0.93 ? 'medium' : 'heavy');
+    loop();
+  }, wait);
+}
+setTimeout(loop, 3400);
+
+/* ---------- приборы ---------- */
+setInterval(() => {
+  noiseVal = Math.max(noiseBase, noiseVal - 0.12);
+  purityVal = Math.min(awakened ? 99.3 : 99.99, purityVal + 0.015);
+  noiseEl.textContent = noiseVal.toFixed(2) + '%';
+  purityEl.textContent = purityVal.toFixed(2) + '%';
+  noiseEl.style.color = noiseVal > 1.5 ? '#ff0033' : '';
+}, 900);
+
+/* ---------- параллакс и курсор ---------- */
+if (!isTouch) {
+  let mx = 0, my = 0, px = 0, py = 0;
+  let rx = innerWidth / 2, ry = innerHeight / 2;
+  let cxp = rx, cyp = ry, cxd = rx, cyd = ry;
+  const layers = document.querySelectorAll('[data-depth]');
+
+  addEventListener('pointermove', e => {
+    rx = e.clientX; ry = e.clientY;
+    mx = e.clientX / innerWidth - 0.5;
+    my = e.clientY / innerHeight - 0.5;
+  });
+
+  (function raf() {
+    px += (mx - px) * 0.05;
+    py += (my - py) * 0.05;
+    layers.forEach(el => {
+      const d = +el.dataset.depth;
+      el.style.transform = `translate3d(${(px * d).toFixed(1)}px, ${(py * d).toFixed(1)}px, 0)`;
+    });
+    cxp += (rx - cxp) * 0.2;
+    cyp += (ry - cyp) * 0.2;
+    cxd += (rx - cxd) * 0.5;
+    cyd += (ry - cyd) * 0.5;
+    cursorEl.style.left = cxp + 'px';
+    cursorEl.style.top = cyp + 'px';
+    cdot.style.left = cxd + 'px';
+    cdot.style.top = cyd + 'px';
+    requestAnimationFrame(raf);
+  })();
+
+  [numWrap, document.querySelector('.back')].forEach(el => {
+    el.addEventListener('mouseenter', () => cursorEl.classList.add('grow'));
+    el.addEventListener('mouseleave', () => cursorEl.classList.remove('grow'));
+  });
+}
+
+/* ---------- круги при касании ---------- */
+world.addEventListener('pointerdown', e => {
+  if (e.target.closest('#numWrap')) return;
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = e.clientX + 'px';
+  r.style.top = e.clientY + 'px';
+  world.appendChild(r);
+  setTimeout(() => r.remove(), 1300);
+});
+
+/* ---------- касание числа ---------- */
+numWrap.addEventListener('click', () => {
+  const now = Date.now();
+  if (now - lastClick < 300) return;
+  lastClick = now;
+  clicks++;
+  hint.classList.add('hide');
+  numWrap.classList.remove('pulse');
+  void numWrap.offsetWidth;
+  numWrap.classList.add('pulse');
+  burst(0.05, 0.08);
+  if (!awakened && clicks >= 7) deepCorruption();
+  else if (awakened) glitch('heavy');
+});
+
+/* ---------- глубокое разрушение ---------- */
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function deepCorruption() {
+  awakened = true;
+  drone();
+  numWrap.classList.add('possessed');
+  document.body.classList.add('danger');
+  noiseCv.classList.add('on');
+
+  const steps = REDUCED ? 4 : 16;
+  for (let i = 0; i < steps; i++) {
+    world.classList.toggle('invert');
+    world.classList.add('split');
+    spawnBars('heavy');
+    drawNoise();
+    if (i % 3 === 0) flashWord();
+    burst(0.09, 0.1);
+    await sleep(120 + Math.random() * 90);
+  }
+
+  world.classList.remove('invert');
+  world.classList.remove('split');
+  numWrap.classList.remove('possessed');
+  whiteflash.classList.add('on');
+  setTimeout(() => whiteflash.classList.remove('on'), 950);
+  noiseCv.classList.remove('on');
+  document.body.classList.remove('danger');
+
+  /* рай восстанавливается — но уже не тот */
+  noiseVal = 3.14; noiseBase = 1.34; mult = 0.62;
+  purityVal = 98.66;
+  setTimeout(() => awakenedLine.classList.add('show'), 1400);
+}
+
+})();
+</script>
+</body>
+</html>
