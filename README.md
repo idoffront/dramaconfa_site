@@ -1,2 +1,2 @@
-# dramaconfa.github.io
+# dramaconfa
 My Vibecoded website lolkek 134
