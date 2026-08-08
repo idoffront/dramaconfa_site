@@ -547,11 +547,12 @@ function flashRealm(){
 function boot(){
   var log=el('bootlog'),bar=document.querySelector('#bootbar i'),mins=Math.round(store.get('minutes',0));
   var lines=[
-    'dSecureShell · сборка 0.134-final',
+    'dSECURE_SHELL · сборка 0.134-final',
     'канал: не заявлен · допуск: отсутствует',
     'архив: '+S.visits+' входов · '+found.size+' наблюдений · '+mins+' мин надзора',
     S.halo?'ореол на месте.':null,
     '…тебя здесь не должно быть.',
+    'NODE000 - попытка прослушки',
     'игнорирую. загружаю.'
   ].filter(Boolean);
   var i=0;
@@ -838,7 +839,7 @@ addEventListener('keydown',function(e){
     if(S.buf.slice(-3)==='134')alignEvent();
     else if(S.buf.slice(-3)==='who'){award('word-who');whisper('мы — стенографисты драмы. мы пишем, пока никто не играет.');}
     else if(S.buf.slice(-4)==='open')whisper('уже открыто. ты внутри.');
-    else if(S.buf.slice(-5)==='drama'){whisper('драма — это данные под давлением.');glitch(200);}
+    else if(S.buf.slice(-5)==='drama'){whisper('драмаконфа?');glitch(200);}
     else if(S.buf.slice(-4)==='help')whisper('спасение не предусмотрено. наблюдение — да.');
     else if(S.buf.slice(-6)==='showme'||S.buf.slice(-7)==='show me'){
       if(!S.revDone&&!S.rev)startRev();else whisper('один взгляд за цикл.');
